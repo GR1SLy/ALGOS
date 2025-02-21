@@ -267,5 +267,5 @@ inline void List<T>::print()
         current = current->next;
     }
     cout << current->value << endl;
-    cout << "Head: " << head->value << "\tTail: " << tail->value << endl;
+    // cout << "Head: " << head->value << "\tTail: " << tail->value << endl;
 }
