@@ -4,8 +4,11 @@ project(ALGOS)
 
 set(SOURCES
     source.cpp
-    lib/list/list.cpp
 )
+
+set (CMAKE_CXX_STANDARD 17)
+
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(lib/list)
 
