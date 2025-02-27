@@ -27,13 +27,17 @@ public:
     struct iterator
     {
         iterator() { node = nullptr; }
-        iterator(Node<T>* n) { node = n; }
-        T operator*() { return node->value; }
+        iterator(Node<T>* n, List<T>* l) { node = n; list = l; }
+        T& operator*() { 
+            if (node == nullptr) throw std::runtime_error("iterator points to null");
+            return node->value;
+        }
         iterator& operator++() { node = node->next; return *this; }
-        bool operator!=(const iterator& other) { return node != other.node; }
-        bool operator==(const iterator& other) { return node == other.node; }
+        bool operator!=(const iterator& other) { return (this->node != other.node) || (this->list != other.list); }
+        bool operator==(const iterator& other) { return (this->node == other.node) && (this->list == other.list); }
     private:
         Node<T> *node;
+        List<T> *list;
     };
 
     List();
@@ -45,7 +49,7 @@ public:
     bool contains(T value);
     T at(int index);
     void swap_to(T value, int index);
-    iterator find(T value);
+    int find(T value);
     void push_front(T value);
     void insert_after(int index, T value);
     void pop_front();
@@ -165,17 +169,19 @@ inline void List<T>::swap_to(T value, int index)
 }
 
 template <typename T>
-inline typename List<T>::iterator List<T>::find(T value)
+inline int List<T>::find(T value)
 {
     Node<T>* current = head;
+    int index = 0;
     while (current->next != head) {
         if (current->value == value) {
-            return iterator(current);
+            return index;
         }
         current = current->next;
+        index++;
     }
-    if (current->value == value) return iterator(current);
-    return this->end();
+    if (current->value == value) return index;
+    return -1;
 }
 
 template <typename T>
@@ -248,13 +254,13 @@ inline void List<T>::erase_after(int index)
 template <typename T>
 inline typename List<T>::iterator List<T>::begin()
 {
-    return iterator(head);
+    return iterator(head, this);
 }
 
 template <typename T>
 inline typename List<T>::iterator List<T>::end()
 {
-    return iterator(tail);
+    return iterator(tail, this);
 }
 
 template <typename T>
