@@ -32,7 +32,7 @@ public:
             if (node == nullptr) throw std::runtime_error("iterator points to null");
             return node->value;
         }
-        iterator& operator++() { node = node->next; return *this; }
+        iterator& operator++() { if (node != nullptr) node = node->next; return *this; }
         bool operator!=(const iterator& other) { return (this->node != other.node) || (this->list != other.list); }
         bool operator==(const iterator& other) { return (this->node == other.node) && (this->list == other.list); }
     private:
@@ -48,12 +48,13 @@ public:
     bool empty();
     bool contains(T value);
     T at(int index);
-    void swap_to(T value, int index);
+    bool swap_to(T value, int index);
     int find(T value);
     void push_front(T value);
-    void insert_after(int index, T value);
+    bool insert_after(int index, T value);
     void pop_front();
-    void erase_after(int index);
+    bool erase_after(int index);
+    bool erase_by_val(T value);
     iterator begin();
     iterator end();
 
@@ -154,18 +155,19 @@ inline T List<T>::at(int index)
 }
 
 template <typename T>
-inline void List<T>::swap_to(T value, int index)
+inline bool List<T>::swap_to(T value, int index)
 {
     if (index < 0 || index >= count) {
-        throw std::out_of_range("Swap index out of range");
+        return false;
     }
     Node<T>* current = head;
     for (int i = 0; i < count; ++i, current = current->next) {
         if (i == index) {
             current->value = value;
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 template <typename T>
@@ -201,10 +203,10 @@ inline void List<T>::push_front(T value)
 }
 
 template <typename T>
-inline void List<T>::insert_after(int index, T value)
+inline bool List<T>::insert_after(int index, T value)
 {
     if (index < 0 || index >= count) {
-        throw std::out_of_range("Insert index out of range");
+        return false;
     }
     Node<T>* current = head;
     for (int i = 0; i < count; ++i, current = current->next) {
@@ -213,9 +215,10 @@ inline void List<T>::insert_after(int index, T value)
             current->next = new_node;
             if (current == tail) tail = new_node;
             count++;
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 template <typename T>
@@ -233,10 +236,10 @@ inline void List<T>::pop_front()
 }
 
 template <typename T>
-inline void List<T>::erase_after(int index)
+inline bool List<T>::erase_after(int index)
 {
     if (index < 0 || index >= count - 1) {
-        throw std::out_of_range("Erase index out of range");
+        return false;
     }
     Node<T>* current = head;
     for (int i = 0; i < count; ++i, current = current->next) {
@@ -246,9 +249,40 @@ inline void List<T>::erase_after(int index)
             if (erasing_node == tail) tail = current;
             delete erasing_node;
             count--;
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+template <typename T>
+inline bool List<T>::erase_by_val(T value)
+{
+    if (this->empty()) return false;
+    Node<T>* current = head;
+    Node<T>* prev = head;
+    if (head->value == value) {
+        this->pop_front();
+        return true;
+    }
+    while (current->next != head) {
+        if (current->value == value) {
+            prev->next = current->next;
+            delete current;
+            count--;
+            return true;
+        }
+        prev = current;
+        current = current->next;
+    }
+    if (current->value == value) {
+        prev->next = current->next;
+        if (current == tail) tail = prev;
+        delete current;
+        count--;
+        return true;
+    }
+    return false;
 }
 
 template <typename T>
@@ -273,5 +307,5 @@ inline void List<T>::print()
         current = current->next;
     }
     cout << current->value << endl;
-    // cout << "Head: " << head->value << "\tTail: " << tail->value << endl;
+    cout << "Head: " << head->value << "\tTail: " << tail->value << endl;
 }

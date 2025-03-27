@@ -19,6 +19,8 @@ void displayMenu() {
     std::cout << "14: Итератор: Заменить текущий элемент\n";
     std::cout << "15: Создать второй итератор и сравнить\n";
     std::cout << "16: Вывести список\n";
+    std::cout << "17: Узнать размер списка\n";
+    std::cout << "18: Удалить заданное значение\n";
     std::cout << "0: Выйти\n";
     std::cout << "Выберите операцию: ";
 }
@@ -33,32 +35,30 @@ void handleMenu(List<T>& list, typename List<T>::iterator& it) {
         std::cin >> choice;
         switch (choice) {
             case 1:
+            {
                 std::cout << "Введите значение для вставки: ";
                 std::cin >> value;
                 list.push_front(value);
                 break;
+            }
             case 2:
                 list.pop_front();
                 std::cout << "Элемент удален из начала.\n";
                 break;
             case 3:
+            {
                 std::cout << "Введите индекс и значение для вставки: ";
                 std::cin >> index >> value;
-                try {
-                    list.insert_after(index, value);
-                } catch (const std::exception& e) { 
-                    std::cout << "Exception" << std::endl; 
-                }
+                bool res = list.insert_after(index, value);
+                std::cout << "Operation result: " << res << std::endl;
                 break;
+            }
             case 4:
             {
                 std::cout << "Введите индекс для удаления следующего элемента: ";
                 std::cin >> index;
-                try {
-                    list.erase_after(index);
-                } catch (const std::exception& e) {
-                    std::cout << "Exception" << std::endl;
-                }
+                bool res = list.erase_after(index);
+                std::cout << "Operation result: " << res << std::endl;
                 break;
             }
             case 5:
@@ -83,11 +83,8 @@ void handleMenu(List<T>& list, typename List<T>::iterator& it) {
             {
                 std::cout << "Введите индекс и новое значение: ";
                 std::cin >> index >> value;
-                try {
-                    list.swap_to(value, index);
-                } catch (const std::exception& e) {
-                    std::cout << "Exception: " << std::endl;
-                }
+                bool res = list.swap_to(value, index);
+                std::cout << "Operation result: " << res << std::endl;
                 break;
             }
             case 8:
@@ -109,23 +106,29 @@ void handleMenu(List<T>& list, typename List<T>::iterator& it) {
             case 11:
             {
                 it = list.begin();
-                std::cout << *it << std::endl;
                 break;
             }
             case 12: 
                 ++it;
                 break;
             case 13:
-                std::cout << *it << std::endl;
+            {
+                try {
+                    std::cout << *it << std::endl;
+                } catch (std::exception& e) { std::cout << "Exception" << std::endl; }
                 break;
+            }
             case 14:
             {
                 std::cout << "Введите новый элемент: ";
-                cin >> *it;
+                try {
+                    cin >> *it;
+                } catch (std::exception& e) { std::cout << "Exception" << std::endl; }
                 break;
             }
             case 15:
             {
+                if (list.empty()) { std::cout << "Список пуст!" << std::endl; break; }
                 auto it2 = list.begin();
                 std::cout << "First iterator: " << *it << " Second iterator: " << *it2 << std::endl;
                 std::cout << (it == it2) << std::endl;
@@ -134,6 +137,17 @@ void handleMenu(List<T>& list, typename List<T>::iterator& it) {
             case 16:
                 list.print();
                 break;
+            case 17:
+                std::cout << list.size() << std::endl;
+                break;
+            case 18:
+            {
+                int n;
+                std::cout << "Введите удаляемое значение: ";
+                std::cin >> n;
+                std::cout << list.erase_by_val(n) << std::endl;
+                break;
+            }
             case 0:
                 std::cout << "Выход из программы.\n";
                 break;
