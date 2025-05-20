@@ -308,12 +308,11 @@ public:
         Iterator& operator--() {
             if (cur) {
                 cur = p->GetPrev(cur);
-            }
-            else {
+            } else {
                 cur = p->Max(p->GetRoot());
             }
             return *this;
-        }
+        }   
         bool operator==(const Iterator& it) { 
             return cur == it.cur;
         }
@@ -334,6 +333,8 @@ public:
         ReverseIterator& operator++() {
             if (cur) {
                 cur = p->GetPrev(cur);
+            } else {
+                cur = p->Min(p->GetRoot());
             }
             return *this;
         }
@@ -355,33 +356,19 @@ public:
     };
 
     Iterator begin() {
-        NodeBST<T, K>* t = root;
-        if (t != nullptr) {
-            while (t->left != nullptr) t = t->left;
-        }
-        return Iterator(t, this);
+        return Iterator(Min(root), this);
     }
+
     Iterator end() {
-        NodeBST<T, K>* t = root;
-        if (t != nullptr) {
-            while (t->right != nullptr) t = t->right;
-        }
-        return Iterator(t->right, this);
+        return Iterator(nullptr, this);
     }
 
     ReverseIterator rbegin() {
-        NodeBST<T, K>* t = root;
-        if (t != nullptr) {
-            while (t->right != nullptr) t = t->right;
-        }
-        return ReverseIterator(t, this);
+        return ReverseIterator(Max(root), this);
     }
+
     ReverseIterator rend() {
-        NodeBST<T, K>* t = root;
-        if (t != nullptr) {
-            while (t->left != nullptr) t = t->left;
-        }
-        return ReverseIterator(t->left, this);
+        return ReverseIterator(nullptr, this);
     }
 
 private:

@@ -48,6 +48,7 @@ int Options() {
     cout << "12. Set direct iterator to begin" << endl;
     cout << "13. Set reverse iterator to begin" << endl;
     cout << "14. Workload testing" << endl;
+    cout << "15. Test == for iterator" << endl;
     cout << "0.  Exit" << endl;
     cout << "============================================" << endl;
     cout << "Enter the command: ";
@@ -59,7 +60,7 @@ int IteratorOptions() {
     cout << "============= Iterator Options ==============" << endl;
     cout << "1. Direct iterator ++" << endl;
     cout << "2. Direct iterator --" << endl;
-    cout << "3. Direct iterator == end" << endl;
+    cout << "3. Direct iterator set to end" << endl;
     cout << "4. Print direct iterator value" << endl;
     cout << "5. Change direct iterator value" << endl;
     cout << "0. Exit" << endl;
@@ -73,7 +74,7 @@ int RIteratorOptions() {
     cout << "============= Iterator Options ==============" << endl;
     cout << "1. Reverse iterator ++" << endl;
     cout << "2. Reverse iterator --" << endl;
-    cout << "3. Reverse iterator == end" << endl;
+    cout << "3. Reverse iterator set to end" << endl;
     cout << "4. Print reverse iterator value" << endl;
     cout << "5. Change reverse iterator value" << endl;
     cout << "0. Exit" << endl;
@@ -95,8 +96,8 @@ void IteratorMenu(MyBST<int, int>& tree, MyBST<int, int>::Iterator& iter) {
             --iter;
             break;
         case 3:
-            cout << "iterator == end()" << endl;
-            cout << iter.operator==(tree.end()) << endl;
+            cout << "iterator = end()" << endl;
+            iter = tree.end();
             break;
         case 4:
             try {
@@ -144,8 +145,8 @@ void RIteratorMenu(MyBST<int, int>& tree, MyBST<int, int>::ReverseIterator& rite
             --riter;
             break;
         case 3:
-            cout << "iterator == rend()" << endl;
-            cout << riter.operator==(tree.rend()) << endl;
+            cout << "iterator = rend()" << endl;
+            riter = tree.rend();
             break;
         case 4:
             try {
@@ -306,7 +307,19 @@ void Menu() {
                 cout << endl << "-----------------" << endl << endl;
             }
             break;
-
+        case 15:
+            system("clear");
+            cout << "Enter keys to compare iterators: ";
+            int k1, k2;
+            cin >> k1 >> k2;
+            try{
+                MyBST<int, int>::Iterator iter1(tree.Search(k1), &tree);
+                MyBST<int, int>::Iterator iter2(tree.Search(k2), &tree);
+                cout << (iter1 == iter2) << endl;
+            } catch (std::invalid_argument &e) {
+                cout << "Exception" << endl;
+            }
+            break;
         case 0:
             f = false;
             break;
