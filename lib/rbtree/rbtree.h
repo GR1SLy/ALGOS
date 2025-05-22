@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 
+
 template <typename KeyType, typename DataType>
 class RBTree {
 private:
@@ -17,20 +18,18 @@ private:
         DataType data;
         Node *left, *right, *parent;
         Color color;
-        bool isNil;
 
         Node(const KeyType& k, const DataType& d, Color c = RED, Node* p = nullptr, Node* l = nullptr, Node* r = nullptr)
-            : key(k), data(d), color(c), parent(p), left(l), right(r), isNil(false) {}
+            : key(k), data(d), color(c), parent(p), left(l), right(r) {} 
 
-        Node() : color(BLACK), parent(nullptr), left(nullptr), right(nullptr), isNil(true) {}
     };
 
     Node* root;
     size_t count;
-    mutable size_t nodesVisited;
+    mutable size_t nodesVisited; 
 
     Color getColor(Node* node) const {
-        if (node == nullptr) return BLACK;
+        if (node == nullptr) return BLACK; 
         return node->color;
     }
 
@@ -77,47 +76,51 @@ private:
         y->parent = x;
     }
 
-    void insertFixup(Node* z) {
+    void insertFixup(Node* z) { 
         while (z != root && getColor(z->parent) == RED) {
             nodesVisited++;
-            Node* uncle;
-            if (z->parent == z->parent->parent->left) {
-                uncle = z->parent->parent->right;
-                if (getColor(uncle) == RED) {
-                    setColor(z->parent, BLACK);
-                    setColor(uncle, BLACK);
-                    setColor(z->parent->parent, RED);
-                    z = z->parent->parent;
-                } else {
-                    if (z == z->parent->right) {
-                        z = z->parent;
+            Node* parent_z = z->parent;
+            Node* grandparent_z = parent_z->parent; 
+
+            if (parent_z == grandparent_z->left) {
+                Node* uncle_z = grandparent_z->right;
+                if (getColor(uncle_z) == RED) { 
+                    setColor(parent_z, BLACK);
+                    setColor(uncle_z, BLACK);
+                    setColor(grandparent_z, RED);
+                    z = grandparent_z; 
+                } else { 
+                    if (z == parent_z->right) {
+                        z = parent_z;
                         leftRotate(z);
+                        parent_z = z->parent;
                     }
-                    setColor(z->parent, BLACK);
-                    setColor(z->parent->parent, RED);
-                    rightRotate(z->parent->parent);
+                    setColor(parent_z, BLACK);
+                    setColor(grandparent_z, RED); 
+                    rightRotate(grandparent_z);
                 }
-            } else {
-                uncle = z->parent->parent->left;
-                if (getColor(uncle) == RED) {
-                    setColor(z->parent, BLACK);
-                    setColor(uncle, BLACK);
-                    setColor(z->parent->parent, RED);
-                    z = z->parent->parent;
+            } else { 
+                Node* uncle_z = grandparent_z->left;
+                if (getColor(uncle_z) == RED) {
+                    setColor(parent_z, BLACK);
+                    setColor(uncle_z, BLACK);
+                    setColor(grandparent_z, RED);
+                    z = grandparent_z;
                 } else {
-                    if (z == z->parent->left) {
-                        z = z->parent;
+                    if (z == parent_z->left) {
+                        z = parent_z;
                         rightRotate(z);
+                        parent_z = z->parent;
                     }
-                    setColor(z->parent, BLACK);
-                    setColor(z->parent->parent, RED);
-                    leftRotate(z->parent->parent);
+                    setColor(parent_z, BLACK);
+                    setColor(grandparent_z, RED);
+                    leftRotate(grandparent_z);
                 }
             }
         }
         setColor(this->root, BLACK);
     }
-    
+
     void transplant(Node* u, Node* v) {
         nodesVisited++;
         if (u->parent == nullptr) {
@@ -131,10 +134,11 @@ private:
             v->parent = u->parent;
         }
     }
-    
+
     Node* findMinNodeInSubtree(Node* node) const {
         if (!node) return nullptr;
         while (node->left != nullptr) {
+            nodesVisited++;
             node = node->left;
         }
         return node;
@@ -143,85 +147,92 @@ private:
     Node* findMaxNodeInSubtree(Node* node) const {
         if (!node) return nullptr;
         while (node->right != nullptr) {
+            nodesVisited++;
             node = node->right;
         }
         return node;
     }
 
-
-    void removeFixup(Node* x) {
+    void removeFixup(Node* x, Node* xp) {
         while (x != root && getColor(x) == BLACK) {
             nodesVisited++;
-            if (x->parent == nullptr) break;
+            if (xp == nullptr) { 
+                break;
+            }
 
-            if (x == x->parent->left) {
-                Node* w = x->parent->right;
-                if (getColor(w) == RED) {
+            if (x == xp->left) {
+                Node* w = xp->right; 
+                if (getColor(w) == RED) { 
                     setColor(w, BLACK);
-                    setColor(x->parent, RED);
-                    leftRotate(x->parent);
-                    w = x->parent->right;
+                    setColor(xp, RED);
+                    leftRotate(xp);
+                    w = xp->right;
                 }
                 if (w == nullptr) {
-                     x = x->parent;
-                     continue;
+                    x = xp;
+                    xp = xp->parent;
+                    continue;
                 }
-                if (getColor(w->left) == BLACK && getColor(w->right) == BLACK) {
+                if (getColor(w->left) == BLACK && getColor(w->right) == BLACK) { 
                     setColor(w, RED);
-                    x = x->parent;
+                    x = xp;
+                    xp = xp->parent;
                 } else {
                     if (getColor(w->right) == BLACK) {
                         setColor(w->left, BLACK);
                         setColor(w, RED);
                         rightRotate(w);
-                        w = x->parent->right;
+                        w = xp->right;
                     }
-                    if (w == nullptr) {
-                        x = x->parent;
-                        continue;
+                    if (w == nullptr) { 
+                         x = xp; xp = xp->parent; continue;
                     }
-                    setColor(w, getColor(x->parent));
-                    setColor(x->parent, BLACK);
+                    setColor(w, getColor(xp));
+                    setColor(xp, BLACK);
                     setColor(w->right, BLACK);
-                    leftRotate(x->parent);
+                    leftRotate(xp);
                     x = root;
                 }
-            } else {
-                Node* w = x->parent->left;
+            } else { 
+                Node* w = xp->left; 
                 if (getColor(w) == RED) {
                     setColor(w, BLACK);
-                    setColor(x->parent, RED);
-                    rightRotate(x->parent);
-                    w = x->parent->left;
+                    setColor(xp, RED);
+                    rightRotate(xp);
+                    w = xp->left;
                 }
-                 if (w == nullptr) {
-                     x = x->parent;
-                     continue;
-                 }
+                if (w == nullptr) {
+                    x = xp;
+                    xp = xp->parent;
+                    continue;
+                }
                 if (getColor(w->right) == BLACK && getColor(w->left) == BLACK) {
                     setColor(w, RED);
-                    x = x->parent;
+                    x = xp;
+                    xp = xp->parent;
                 } else {
-                    if (getColor(w->left) == BLACK) {
+                    if (getColor(w->left) == BLACK) { 
                         setColor(w->right, BLACK);
                         setColor(w, RED);
                         leftRotate(w);
-                        w = x->parent->left;
+                        w = xp->left;
                     }
-                     if (w == nullptr) {
-                        x = x->parent;
-                        continue;
+                     if (w == nullptr) { 
+                         x = xp; xp = xp->parent; continue;
                      }
-                    setColor(w, getColor(x->parent));
-                    setColor(x->parent, BLACK);
+                    setColor(w, getColor(xp));
+                    setColor(xp, BLACK);
                     setColor(w->left, BLACK);
-                    rightRotate(x->parent);
+                    rightRotate(xp);
                     x = root;
                 }
             }
         }
-        if (x != nullptr) setColor(x, BLACK);
+        if (x != nullptr) { 
+            setColor(x, BLACK);
+        }
     }
+
 
     Node* findNodeRecursive(Node* current, const KeyType& key) const {
         nodesVisited++;
@@ -266,9 +277,7 @@ public:
 
     RBTree& operator=(const RBTree& other) {
         if (this != &other) {
-            clearRecursive(root);
-            root = nullptr;
-            count = 0;
+            clear();
             root = copyRecursive(other.root, nullptr);
             count = other.count;
         }
@@ -294,7 +303,7 @@ public:
         nodesVisited = 0;
         return true;
     }
-    
+
     DataType& operator[](const KeyType& key) {
         nodesVisited = 0;
         Node* node = findNodeRecursive(root, key);
@@ -303,30 +312,25 @@ public:
         } else {
             DataType default_val = DataType();
             insert(key, default_val);
-            nodesVisited = 0;
-            node = findNodeRecursive(root, key);
-                                             
-            if(node) return node->data;
+            Node* inserted_node = findNodeRecursive(root, key); 
+            if(inserted_node) return inserted_node->data;
             else {
                  throw std::runtime_error("RBTree::operator[]: Critical error - node not found after insert.");
             }
         }
     }
 
+    DataType& find(const KeyType& key) {
+        return this->operator[](key);
+    }
+
     bool insert(const KeyType& key, const DataType& data) {
         nodesVisited = 0;
         Node* z = new Node(key, data);
         
-        if (root == nullptr) {
-            root = z;
-            setColor(root, BLACK);
-            count++;
-            nodesVisited = 1;
-            return true;
-        }
-        
         Node* y = nullptr;
         Node* x = this->root;
+
         while(x != nullptr){
             nodesVisited++;
             y = x;
@@ -334,21 +338,25 @@ public:
                 x = x->left;
             } else if (z->key > x->key) {
                 x = x->right;
-            } else {
-                x->data = data;
-                delete z;
-                return true;
+            } else { 
+                x->data = data; 
+                delete z;       
+                return true;    
             }
         }
+        
         z->parent = y;
-        if (z->key < y->key) {
+        if (y == nullptr) {
+            this->root = z;
+            nodesVisited++;
+        } else if (z->key < y->key) {
             y->left = z;
         } else {
             y->right = z;
         }
-        
-        count++;
+
         insertFixup(z);
+        count++;
         return true;
     }
 
@@ -358,66 +366,58 @@ public:
         if (z == nullptr) {
             return false;
         }
-        
-        Node* y_replaced = z;
-        Node* x_child_of_y = nullptr;
-        Color originalColor_of_y = getColor(y_replaced);
+
+        Node* y = z;
+        Node* x = nullptr;
+        Node* xp = nullptr;
+        Color originalColor_of_y = getColor(y);
 
         if (z->left == nullptr) {
-            x_child_of_y = z->right;
+            x = z->right;
+            xp = z->parent;
             transplant(z, z->right);
         } else if (z->right == nullptr) {
-            x_child_of_y = z->left;
+            x = z->left;
+            xp = z->parent;
             transplant(z, z->left);
         } else {
-            y_replaced = findMinNodeInSubtree(z->right);
-            originalColor_of_y = getColor(y_replaced);
-            x_child_of_y = y_replaced->right;
-            
-            if (y_replaced->parent == z) {
-                if (x_child_of_y != nullptr) x_child_of_y->parent = y_replaced;
+            y = findMinNodeInSubtree(z->right);
+            originalColor_of_y = getColor(y);
+            x = y->right;
+
+            if (y->parent == z) {
+                xp = y;
+                if (x != nullptr) {
+                    x->parent = y;
+                }
             } else {
-                transplant(y_replaced, y_replaced->right);
-                y_replaced->right = z->right;
-                if(y_replaced->right != nullptr) y_replaced->right->parent = y_replaced;
+                xp = y->parent;
+                transplant(y, y->right);
+                y->right = z->right;
+                if (y->right != nullptr) {
+                    y->right->parent = y;
+                }
             }
-            transplant(z, y_replaced);
-            y_replaced->left = z->left;
-            if(y_replaced->left != nullptr) y_replaced->left->parent = y_replaced;
-            setColor(y_replaced, getColor(z));
+            transplant(z, y);
+            y->left = z->left;
+            if (y->left != nullptr) {
+                y->left->parent = y;
+            }
+            setColor(y, getColor(z));
         }
+
         delete z;
         count--;
 
         if (originalColor_of_y == BLACK) {
-            if (x_child_of_y != nullptr) {
-                removeFixup(x_child_of_y);
-            }
+            Node* actual_parent_for_fixup = (x != nullptr) ? x->parent : xp;
+            removeFixup(x, actual_parent_for_fixup);
         }
-        if (root != nullptr) setColor(root, BLACK);
+        
+        if (this->root != nullptr) {
+            setColor(this->root, BLACK);
+        }
         return true;
-    }
-
-    void print() {
-        Show(root, 0);
-    }
-    void Show(Node* t, int level) {
-        if (t == nullptr && level == 0) {
-            std::cout << "Tree is empty" << std::endl;
-            return;
-        }
-        if (t == nullptr) {
-            for (int i = 0; i < 3 * level; i++)
-                std::cout << "   ";
-            std::cout << "*" << std::endl;
-            return;
-        }
-        Show(t->right, level + 1);
-        for (int i = 0; i < 2 * level; i++)
-            std::cout << "   ";
-        char color = (t->color)? 'R':'B';
-        std::cout << "(" << t->key << ", " << color << ")" << std::endl;
-        Show(t->left, level + 1);
     }
 
     size_t getNodesVisited() const {
@@ -426,22 +426,6 @@ public:
 
     void clearNodesVisited() {
         nodesVisited = 0;
-    }
-
-    ForwardIterator begin() const {
-        return ForwardIterator(this, findMinNodeInSubtree(root));
-    }
-
-    ForwardIterator end() const {
-        return ForwardIterator(this, nullptr);
-    }
-
-    ReverseIterator rbegin() const {
-        return ReverseIterator(this, findMaxNodeInSubtree(root));
-    }
-
-    ReverseIterator rend() const {
-        return ReverseIterator(this, nullptr);
     }
 
     class ForwardIterator {
@@ -472,24 +456,25 @@ public:
 
         reference operator*() const {
             if (!current_node) {
-                 throw std::out_of_range("Exception");
+                 throw std::out_of_range("Dereferencing end or invalid iterator");
             }
             return current_node->data;
         }
 
-        KeyType getKey() const {
+        const KeyType& getKey() const {
              if (!current_node) {
-                 throw std::out_of_range("Exception");
+                 throw std::out_of_range("Accessing key from end or invalid iterator");
             }
             return current_node->key;
         }
 
+
         ForwardIterator& operator++() {
             if (!current_node) {
-                throw std::out_of_range("Exception");
+                throw std::out_of_range("Incrementing end or invalid iterator");
             }
 
-            if (current_node->right) {
+            if (current_node->right != nullptr) {
                 current_node = getMinInSubtree(current_node->right);
             } else {
                 Node* p = current_node->parent;
@@ -509,20 +494,21 @@ public:
         }
         
         ForwardIterator& operator--() {
+            if (!tree_ptr || tree_ptr->isEmpty()) {
+                throw std::out_of_range("Decrementing iterator on empty or invalid tree");
+            }
             if (!current_node) {
-                 if (tree_ptr && tree_ptr->root) {
-                     current_node = getMaxInSubtree(tree_ptr->root);
-                 } else {
-                      throw std::out_of_range("Exception");
+                 current_node = getMaxInSubtree(tree_ptr->root);
+                 if (!current_node) {
+                     throw std::out_of_range("Cannot decrement end iterator of an empty tree");
                  }
                  return *this;
             }
+            if (current_node == getMinInSubtree(tree_ptr->root)) {
+                 throw std::out_of_range("Decrementing past the beginning of the tree");
+            }
 
-             if (tree_ptr && current_node == getMinInSubtree(tree_ptr->root)) {
-                 throw std::out_of_range("Exception");
-             }
-
-            if (current_node->left) {
+            if (current_node->left != nullptr) {
                 current_node = getMaxInSubtree(current_node->left);
             } else {
                 Node* p = current_node->parent;
@@ -578,29 +564,29 @@ public:
         
         reference operator*() const {
              if (!current_node) {
-                 throw std::out_of_range("Exception");
+                 throw std::out_of_range("Dereferencing rend or invalid reverse iterator");
             }
             return current_node->data;
         }
 
-        KeyType getKey() const {
+        const KeyType& getKey() const {
              if (!current_node) {
-                 throw std::out_of_range("Exception");
+                 throw std::out_of_range("Accessing key from rend or invalid reverse iterator");
             }
             return current_node->key;
         }
 
         ReverseIterator& operator++() {
              if (!current_node) {
-                 throw std::out_of_range("Exception");
+                 throw std::out_of_range("Incrementing rend or invalid reverse iterator");
             }
-            
+        
             if (tree_ptr && current_node == getMinInSubtree(tree_ptr->root)) {
                  current_node = nullptr;
                  return *this;
             }
 
-            if (current_node->left) {
+            if (current_node->left != nullptr) {
                 current_node = getMaxInSubtree(current_node->left);
             } else {
                 Node* p = current_node->parent;
@@ -620,20 +606,22 @@ public:
         }
 
         ReverseIterator& operator--() {
+            if (!tree_ptr || tree_ptr->isEmpty()) {
+                throw std::out_of_range("Decrementing reverse iterator on empty or invalid tree");
+            }
             if (!current_node) {
-                 if (tree_ptr && tree_ptr->root) {
-                     current_node = getMinInSubtree(tree_ptr->root);
-                 } else {
-                    throw std::out_of_range("Exception");
+                 current_node = getMinInSubtree(tree_ptr->root);
+                  if (!current_node) {
+                     throw std::out_of_range("Cannot decrement rend iterator of an empty tree");
                  }
                  return *this;
             }
             
             if (tree_ptr && current_node == getMaxInSubtree(tree_ptr->root)) {
-                throw std::out_of_range("Exception");
+                throw std::out_of_range("Decrementing past the rbegin() of the tree");
             }
 
-            if (current_node->right) {
+            if (current_node->right != nullptr) {
                 current_node = getMinInSubtree(current_node->right);
             } else {
                 Node* p = current_node->parent;
@@ -660,6 +648,43 @@ public:
             return !(*this == other);
         }
     };
+
+    ForwardIterator begin() const {
+        return ForwardIterator(this, findMinNodeInSubtree(root));
+    }
+
+    ForwardIterator end() const {
+        return ForwardIterator(this, nullptr);
+    }
+
+    ReverseIterator rbegin() const {
+        return ReverseIterator(this, findMaxNodeInSubtree(root));
+    }
+
+    ReverseIterator rend() const {
+        return ReverseIterator(this, nullptr);
+    }
+    void print() {
+        Show(root, 0);
+    }
+    void Show(Node* t, int level) {
+        if (t == nullptr && level == 0) {
+            std::cout << "Tree is empty" << std::endl;
+            return;
+        }
+        if (t == nullptr) {
+            for (int i = 0; i < 3 * level; i++)
+                std::cout << "   ";
+            std::cout << "*" << std::endl;
+            return;
+        }
+        Show(t->right, level + 1);
+        for (int i = 0; i < 2 * level; i++)
+            std::cout << "   ";
+        char color = (t->color)? 'B':'R';
+        std::cout << "(" << t->key << ", " << color << ")" << std::endl;
+        Show(t->left, level + 1);
+    }
 };
 
-#endif // RBTREE_H
+#endif

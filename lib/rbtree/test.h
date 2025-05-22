@@ -54,8 +54,7 @@ void test_rand_rbtree(int n) {
     std::cout << "items count:" << tree.getSize() << std::endl;
 
     double I = 0, D = 0, S = 0;
-    int operations = n / 2;
-    if (n == 1) operations = 1;
+    int operations = (n > 1) ? n / 2 : 1;
 
 
     for (int i = 0; i < operations; i++) {
@@ -121,8 +120,7 @@ void test_ord_rbtree(int n) {
      std::cout << "items count:" << tree.getSize() << std::endl;
 
     double I = 0, D = 0, S = 0;
-    int operations = n / 2;
-    if (n == 1) operations = 1;
+    int operations = (n > 1) ? n / 2 : 1;
 
     for (int i = 0; i < operations; i++) {
         int ind = rand() % n;
