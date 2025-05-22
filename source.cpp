@@ -41,16 +41,16 @@ int main() {
     RBTree<int, std::string> tree;
     int choice;
 
-    tree.insert(15, "15");
     tree.insert(10, "10");
-    tree.insert(5, "5");
-    tree.insert(50, "50");
-    tree.insert(11, "11");
-    tree.insert(21, "21");
-    tree.insert(25, "25");
-    tree.insert(52, "52");
+    tree.insert(20, "20");
     tree.insert(30, "30");
-    tree.clearNodesVisited();
+    tree.insert(40, "40");
+    tree.insert(50, "50");
+    tree.insert(60, "60");
+    tree.insert(70, "70");
+    tree.insert(80, "80");
+    tree.insert(90, "90");
+    // tree.clearNodesVisited();
 
     RBTree<int, std::string>::ForwardIterator fwd_it = tree.begin();
     RBTree<int, std::string>::ReverseIterator rev_it = tree.rbegin();
@@ -68,7 +68,6 @@ int main() {
 
         std::cout << "\n--- Прямой Итератор ---" << std::endl;
         std::cout << "10. it = tree.begin()" << std::endl;
-        std::cout << "11. it = tree.end()" << std::endl;
         std::cout << "12. ++it" << std::endl;
         std::cout << "13. --it" << std::endl;
         std::cout << "14. Прочитать *it" << std::endl;
@@ -78,7 +77,6 @@ int main() {
         
         std::cout << "\n--- Обратный Итератор ---" << std::endl;
         std::cout << "20. rit = tree.rbegin()" << std::endl;
-        std::cout << "21. rit = tree.rend()" << std::endl;
         std::cout << "22. ++rit" << std::endl;
         std::cout << "23. --rit" << std::endl;
         std::cout << "24. Прочитать *rit" << std::endl;
@@ -174,6 +172,8 @@ int main() {
                         }
                         test_rand_rbtree(n_test);
                         test_ord_rbtree(n_test);
+                        // test_rand(n_test);
+                        // test_ord(n_test);
                         std::cout << "true\n";
                     }
                     break;
