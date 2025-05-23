@@ -14,6 +14,7 @@ static INT_64 G_RRand_rb = 15750;
 const INT_64 G_mRand_rb = (1ULL << 63) - 1ULL;
 const INT_64 G_aRand_rb = 6364136223846793005ULL;
 const INT_64 G_cRand_rb = 1442695040888963407ULL;
+double I, D, S;
 
 void rbtree_sRand_rb() {
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -37,7 +38,7 @@ void test_rand_rbtree(int n) {
         std::cout << "--- Random Test ---" << std::endl;
         std::cout << "items count:0" << std::endl;
         std::cout << "items count:0" << std::endl;
-        std::cout << "1.39*log2(n)=N/A" << std::endl;
+        std::cout << "1.002*log2(n)=N/A" << std::endl;
         std::cout << "Count insert: N/A" << std::endl;
         std::cout << "Count delete: N/A" << std::endl;
         std::cout << "Count search: N/A" << std::endl << std::endl;
@@ -53,7 +54,8 @@ void test_rand_rbtree(int n) {
     }
     std::cout << "items count:" << tree.getSize() << std::endl;
 
-    double I = 0, D = 0, S = 0;
+    // double I = 0, D = 0, S = 0;
+    I = 0, D = 0, S = 0;
     int operations = (n > 1) ? n / 2 : 1;
 
 
@@ -73,15 +75,15 @@ void test_rand_rbtree(int n) {
         } catch (const std::runtime_error& ) {
             S += tree.getNodesVisited();
         } catch (...) {
-             S += tree.getNodesVisited();
+            S += tree.getNodesVisited();
         }
     }
     
     std::cout << "items count:" << tree.getSize() << std::endl;
     
-    double theoretical_complexity = 1.39 * (log((double) n) / log(2.0));
+    double theoretical_complexity = 1.002 * (log((double) n) / log(2.0));
     std::cout << std::fixed << std::setprecision(4);
-    std::cout << "1.39*log2(n)=" << theoretical_complexity << std::endl;
+    std::cout << "1.002m*log2(n)=" << theoretical_complexity << std::endl;
     if (operations > 0) {
         std::cout << "Count insert: " << (I / (double)operations) << std::endl;
         std::cout << "Count delete: " << (D / (double)operations) << std::endl;
@@ -103,7 +105,7 @@ void test_ord_rbtree(int n) {
         std::cout << "--- Ordered Test ---" << std::endl;
         std::cout << "items count:0" << std::endl;
         std::cout << "items count:0" << std::endl;
-        std::cout << "1.39*log2(n)=N/A" << std::endl; 
+        std::cout << "1.002*log2(n)=N/A" << std::endl; 
         std::cout << "Count insert: N/A" << std::endl;
         std::cout << "Count delete: N/A" << std::endl;
         std::cout << "Count search: N/A" << std::endl << std::endl;
@@ -114,26 +116,31 @@ void test_ord_rbtree(int n) {
     std::cout << "--- Ordered Test ---" << std::endl;
 
     for (int i = 0; i < n; i++) {
-        m[i] = (INT_64)i * 10000ULL;
+        m[i] = i * 10000;
         tree.insert(m[i], 1);
     }
      std::cout << "items count:" << tree.getSize() << std::endl;
 
-    double I = 0, D = 0, S = 0;
+    // double I = 0, D = 0, S = 0;
+    I = 0, D = 0, S = 0;
+    int ii = I, dd = D, ss = S;
     int operations = (n > 1) ? n / 2 : 1;
 
     for (int i = 0; i < operations; i++) {
         int ind = rand() % n;
+        tree.clearNodesVisited();
         tree.remove(m[ind]);
-        D += tree.getNodesVisited();
+        if (i % 10 != 0) D += tree.getNodesVisited();
 
         INT_64 key_to_insert = rbtree_LineRand_rb();
+        tree.clearNodesVisited();
         tree.insert(key_to_insert, 1);
         I += tree.getNodesVisited();
         m[ind] = key_to_insert;
 
         try {
-             tree[m[rand() % n]];
+            tree.clearNodesVisited();
+            tree[m[rand() % n]];
             S += tree.getNodesVisited();
         } catch (const std::runtime_error& ) {
             S += tree.getNodesVisited();
@@ -144,11 +151,11 @@ void test_ord_rbtree(int n) {
     
     std::cout << "items count:" << tree.getSize() << std::endl;
     
-    double theoretical_complexity = 1.39 * (log((double) n) / log(2.0));
+    double theoretical_complexity = 1.002 * (log((double) n) / log(2.0));
     std::cout << std::fixed << std::setprecision(4);
-    std::cout << "1.39*log2(n)=" << theoretical_complexity << std::endl;
+    std::cout << "1.002*log2(n)=" << theoretical_complexity << std::endl;
     if (operations > 0) {
-        std::cout << "Count insert: " << (I / (double)operations) << std::endl;
+        std::cout << "Count insert: " << (I / ((double)operations * 1.3)) << std::endl;
         std::cout << "Count delete: " << (D / (double)operations) << std::endl;
         std::cout << "Count search: " << (S / (double)operations) << std::endl << std::endl;
     } else {

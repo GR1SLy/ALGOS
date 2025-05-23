@@ -4,6 +4,7 @@
 #include <limits>
 #include "lib/rbtree/rbtree.h"
 #include "lib/rbtree/test.h"
+#include "lib/tree/Test.h"
 
 void clearInputBuffer() {
     std::cin.clear();
@@ -170,10 +171,13 @@ int main() {
                             std::cout << "false\n";
                             break;
                         }
+                        std::cout << "=====RBTREE TESTS=====" << std::endl;
                         test_rand_rbtree(n_test);
                         test_ord_rbtree(n_test);
-                        // test_rand(n_test);
-                        // test_ord(n_test);
+                        std::cout << "=====BST TESTS=====\n--- Random test ---" << std::endl;
+                        test_rand(n_test);
+                        std::cout << "\n--- Ordered test ---" << std::endl;
+                        test_ord(n_test);
                         std::cout << "true\n";
                     }
                     break;
