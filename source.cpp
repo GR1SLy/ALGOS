@@ -51,7 +51,6 @@ int main() {
     tree.insert(70, "70");
     tree.insert(80, "80");
     tree.insert(90, "90");
-    // tree.clearNodesVisited();
 
     RBTree<int, std::string>::ForwardIterator fwd_it = tree.begin();
     RBTree<int, std::string>::ReverseIterator rev_it = tree.rbegin();
@@ -118,7 +117,6 @@ int main() {
                             std::cout << "true\n";
                         }
                     } catch (const std::exception& e) {
-                        // std::cout << "false (" << e.what() << ")" << std::endl;
                         std::cout << "Exception" << std::endl;
                     }
                     break;
@@ -171,14 +169,8 @@ int main() {
                             std::cout << "false\n";
                             break;
                         }
-                        std::cout << "=====RBTREE TESTS=====" << std::endl;
                         test_rand_rbtree(n_test);
                         test_ord_rbtree(n_test);
-                        std::cout << "=====BST TESTS=====\n--- Random test ---" << std::endl;
-                        test_rand(n_test);
-                        std::cout << "\n--- Ordered test ---" << std::endl;
-                        test_ord(n_test);
-                        std::cout << "true\n";
                     }
                     break;
                 case 0:
@@ -188,10 +180,8 @@ int main() {
                     std::cout << "false" << std::endl;
             }
         } catch (const std::out_of_range& e) {
-            // std::cout << "false (" << e.what() << ")" << std::endl;
             std::cout << "Exception" << std::endl;
         } catch (const std::exception& e) {
-            //  std::cout << "false (" << e.what() << ")" << std::endl;
             std::cout << "Exception" << std::endl;
         }
     } while (choice != 0);
